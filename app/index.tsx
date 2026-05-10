@@ -30,18 +30,18 @@ export default function Index() {
 
   // Funciton to fetch data from API
   const fetchData = async (limit = 10) => {
-    try{
+    try {
       const response = await fetch(
-      `https://jsonplaceholder.typicode.com/posts?_limit=${limit}`
-    );
-    const data = await response.json();
-    setPostList(data);
-    setIsLoading(false);
-    }catch(e) {
-      console.error('Error while fecthing Data.');
+        `https://jsonplaceholder.typicode.com/posts?_limit=${limit}`
+      );
+      const data = await response.json();
+      setPostList(data);
+    } catch (e) {
+      console.error('Error while fetching data:', e);
+    } finally {
+      // finally always runs — success or failure — so the spinner always stops
       setIsLoading(false);
     }
-    
   };
 
   useEffect(() => {
@@ -78,11 +78,11 @@ export default function Index() {
   }
 
   // function to add post
-  const addPost =async () => {
-    try{
-    if(validateForm()) {
-      setIsPosting(true);
-      const respose = await fetch(
+  const addPost = async () => {
+    if (!validateForm()) return;
+    setIsPosting(true);
+    try {
+      const response = await fetch(
         "https://jsonplaceholder.typicode.com/posts",
         {
           method: "post",
@@ -95,16 +95,16 @@ export default function Index() {
           }),
         }
       );
-      const newPost: Post = await respose.json();
+      const newPost: Post = await response.json();
       setPostList([newPost, ...postList]);
       setPostTitle("");
       setPostBody("");
+    } catch (e) {
+      console.error('Error adding post:', e);
+    } finally {
+      // finally ensures the button is always re-enabled, even if the request fails
       setIsPosting(false);
     }
-  } catch(e) {
-    console.error('Error Adding post',e);
-
-  }
   }
 
   return (
